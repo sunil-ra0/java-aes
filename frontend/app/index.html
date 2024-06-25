@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encryption Demo</title>
+</head>
+<body>
+<h1>Encryption Demo</h1>
+
+<div>
+    <button id="encrypt-button">Encrypt Data</button>
+    <p id="encrypted-data"></p>
+</div>
+
+<div>
+    <button id="decrypt-button">Decrypt Data</button>
+    <p id="decrypted-data"></p>
+</div>
+
+<script>
+    document.getElementById('encrypt-button').addEventListener('click', () => {
+        fetch('/api/encrypt')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('encrypted-data').textContent = 'Encrypted Data: ' + data.encryptedData;
+                localStorage.setItem('encryptedData', data.encryptedData);
+                localStorage.setItem('aesKey', data.aesKey);
+            })
+            .catch(error => console.error('Error:', error));
+    });
+
+    document.getElementById('decrypt-button').addEventListener('click', () => {
+        const encryptedData = localStorage.getItem('encryptedData');
+
+        fetch('/api/decrypt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ encryptedData })
+        })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('decrypted-data').textContent = 'Decrypted Data: ' + data;
+            })
+            .catch(error => console.error('Error:', error));
+    });
+</script>
+</body>
+</html>
